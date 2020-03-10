@@ -11,9 +11,12 @@ data_loader_train, data_loader_test = data_handle.get_data(cfg.dataset)
 model = yolact(cfg.device)
 model.to(cfg.device)
 
+# train
+model.train()
+
 # construct an optimizer
 params = [p for p in model.parameters() if p.requires_grad]
-optimizer = torch.optim.Adam(params, lr=0.001, weight_decay=0.0005)
+optimizer = torch.optim.Adam(params, lr=0.0005, weight_decay=0.0005)
 # and a learning rate scheduler
 lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
@@ -39,21 +42,28 @@ def train(device, optimizer, lr_scheduler, img_c, target_c, anchor_handler, loss
 
     total_loss = loss(device, model, img, target, anchor_handler, plot=plot)
 
-    total_loss.backward()
-    optimizer.step()
-    lr_scheduler.step()
+    if total_loss != 0:
+        total_loss.backward()
+        optimizer.step()
+        lr_scheduler.step()
 
     return total_loss
 
 
-# train
-model.train()
-
 for epoch in range(cfg.total_epoch):
     for iter, (img, target) in enumerate(data_loader_train):
+        '''
+        img = ({C, H, W}, {C, H, W}, ...)
+        target = (target1, target2, ...)
+        
+        target["labels"] = {N, n_box}
+        target["boxes"] = {N, n_box, 4}
+        target["masks"] = {N, n_box, H, W}
+        '''
+        img = torch.stack(img)  # img = {N, C, H, W}
 
         cur = time.time()
-        total_loss = train(cfg.device, optimizer, lr_scheduler, img, target, anchor_handler, loss,
-                           True if epoch == cfg.total_epoch - 1 or iter == len(data_loader_train) - 1 else False)
-
-        print("[{}/{}][{}/{}] train loss : {}, TIME : {}s".format(epoch, cfg.total_epoch, iter, len(data_loader_train), total_loss, time.time() - cur))
+        # total_loss = train(cfg.device, optimizer, lr_scheduler, img, target, anchor_handler, loss,
+        #                    True if epoch == cfg.total_epoch - 1 or iter == len(data_loader_train) - 1 else False)
+        #
+        # print("[{}/{}][{}/{}] train loss : {}, TIME : {}s".format(epoch, cfg.total_epoch, iter, len(data_loader_train), total_loss, time.time() - cur))

@@ -8,10 +8,10 @@ num_classes = 1  # number of classes.
 num_prototype = 6  # number of prototypes.
 default_detect_iou = 0.5  # define isObject threshold.
 
-pre_trained = False
+pre_trained = True
 total_epoch = 200  # epochs.
-train_batch_size = 1  # batch_size.
-train_num_works = 4  # for debug set 0
+train_batch_size = 2  # batch_size.
+train_num_works = 0  # for debug set 0
 
 loss_cls_alpha = 1
 
@@ -25,8 +25,8 @@ using_stop_layer_no = 5
 # in person case 2:5
 
 # dataset = './data/A1'
-# dataset = './data/PennFudanPed'
-dataset = './data/StrawInst'
+dataset = './data/PennFudanPed'
+# dataset = './data/StrawInst'
 
 data_divide = 50
 

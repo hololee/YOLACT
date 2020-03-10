@@ -28,7 +28,8 @@ class PennFudanDataset:
 
         obj_ids = np.unique(mask)
         # Notice change the background
-        obj_ids = obj_ids[:-1]  # except background.
+        obj_ids = obj_ids[1:]  # except background.
+        # obj_ids = obj_ids[:-1]  # except background.
 
         masks = mask == obj_ids[:, None, None]
 
@@ -79,7 +80,7 @@ def get_data(path):
 
     # define training and validation data loaders
     data_loader_train = torch.utils.data.DataLoader(
-        dataset, batch_size=cfg.train_batch_size, shuffle=cfg.shake_data, num_workers=cfg.train_num_works)
+        dataset, batch_size=cfg.train_batch_size, shuffle=cfg.shake_data, num_workers=cfg.train_num_works, collate_fn=utils.collate_fn)
     # collate_fn :  for variable size of batch. , collate_fn=utils.collate_fn
 
     data_loader_test = torch.utils.data.DataLoader(
