@@ -101,6 +101,7 @@ class AllLoss(nn.Module):
                     mul = proto_type.squeeze() * co_ef.squeeze().unsqueeze(dim=-1).unsqueeze(dim=-1)
                     mask_result = torch.sigmoid(mul.sum(0).unsqueeze(0))
                     predict = F.interpolate(mask_result.unsqueeze(0), size=512)
+                    # predict = mask_result.unsqueeze(0)
                     goal = target["masks"][:, int(gt_type), :, :].unsqueeze(0)
 
                     # plot prediction.
