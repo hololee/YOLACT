@@ -9,8 +9,11 @@ num_prototype = 6  # number of prototypes.
 default_detect_iou = 0.5  # define isObject threshold.
 
 pre_trained = True
-total_epoch = 200  # epochs.
-train_batch_size = 2  # batch_size.
+total_epoch = 500  # epochs.
+learning_rate = 0.0001
+weight_decay = 0.0005
+
+train_batch_size = 12  # batch_size.
 train_num_works = 0  # for debug set 0
 
 loss_cls_alpha = 1
@@ -31,4 +34,4 @@ dataset = './data/PennFudanPed'
 data_divide = 50
 
 # gpu number
-device = torch.device(0 if torch.cuda.is_available() else torch.device('cpu'))
+device = torch.device(1 if torch.cuda.is_available() else torch.device('cpu'))

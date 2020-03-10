@@ -16,7 +16,7 @@ model.train()
 
 # construct an optimizer
 params = [p for p in model.parameters() if p.requires_grad]
-optimizer = torch.optim.Adam(params, lr=0.0005, weight_decay=0.0005)
+optimizer = torch.optim.Adam(params, lr=cfg.learning_rate, weight_decay=cfg.weight_decay)
 # and a learning rate scheduler
 lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
@@ -26,21 +26,36 @@ anchor_handler.cal_anchor()
 
 
 def train(device, optimizer, lr_scheduler, img_c, target_c, anchor_handler, loss, plot):
-    img = img_c.to(device)
+    '''
+    img = ({C, H, W}, {C, H, W}, ...)  :tuple
+    target = (target1, target2, ...)   :tuple
+
+    target["labels"] = {N, n_box}
+    target["boxes"] = {N, n_box, 4}
+    target["masks"] = {N, n_box, H, W}
+    '''
+    device_img = img_c.to(device)
     # {"boxes": boxes, "labels": labels, "masks": masks}
 
-    target = target_c
-    target_box = target["boxes"].to(device)
-    target_label = target["labels"].to(device)
-    target_mask = target["masks"].to(device)
+    device_target = []
 
-    target["boxes"] = target_box
-    target["labels"] = target_label
-    target["masks"] = target_mask
+    for one_target in target_c:
+        target = one_target
+        target_box = target["boxes"].to(device)
+        target_label = target["labels"].to(device)
+        target_mask = target["masks"].to(device)
+
+        target["boxes"] = target_box.unsqueeze(0)
+        target["labels"] = target_label.unsqueeze(0)
+        target["masks"] = target_mask.unsqueeze(0)
+
+        device_target.append(one_target)
+
+    device_target = tuple(device_target)
 
     optimizer.zero_grad()
 
-    total_loss = loss(device, model, img, target, anchor_handler, plot=plot)
+    total_loss = loss(device, model, device_img, device_target, anchor_handler, plot=plot)
 
     if total_loss != 0:
         total_loss.backward()
@@ -51,6 +66,8 @@ def train(device, optimizer, lr_scheduler, img_c, target_c, anchor_handler, loss
 
 
 for epoch in range(cfg.total_epoch):
+    epoch_time = time.time()
+
     for iter, (img, target) in enumerate(data_loader_train):
         '''
         img = ({C, H, W}, {C, H, W}, ...)
@@ -63,7 +80,8 @@ for epoch in range(cfg.total_epoch):
         img = torch.stack(img)  # img = {N, C, H, W}
 
         cur = time.time()
-        # total_loss = train(cfg.device, optimizer, lr_scheduler, img, target, anchor_handler, loss,
-        #                    True if epoch == cfg.total_epoch - 1 or iter == len(data_loader_train) - 1 else False)
-        #
-        # print("[{}/{}][{}/{}] train loss : {}, TIME : {}s".format(epoch, cfg.total_epoch, iter, len(data_loader_train), total_loss, time.time() - cur))
+        total_loss = train(cfg.device, optimizer, lr_scheduler, img, target, anchor_handler, loss,
+                           True if epoch == cfg.total_epoch - 1 or iter == len(data_loader_train) - 1 else False)
+
+        print("[{}/{}][{}/{}] train loss : {}, TIME : {}s".format(epoch + 1, cfg.total_epoch, iter + 1, len(data_loader_train), total_loss, time.time() - cur))
+    print("EPOCH TIME : {}s".format(time.time() - epoch_time))
