@@ -38,6 +38,7 @@ class AnchorHandler:
         self.feature_width = {'p3': img_w // (2 ** 3), 'p4': img_w // (2 ** 4), 'p5': img_w // (2 ** 5),
                               'p6': img_w // (2 ** 6), 'p7': img_w // (2 ** 7)}
 
+        assert 4 > cfg.using_start_layer_no > 0 and cfg.using_start_layer_no < cfg.using_stop_layer_no <= 5, "Check the index of layer."
         self.layers = self.layers_T[cfg.using_start_layer_no: cfg.using_stop_layer_no]
 
         self.anchor_centers = {}
@@ -155,9 +156,9 @@ class AnchorHandler:
 
         return iou.cpu().numpy() if isinstance(iou, torch.Tensor) else iou
 
-    def calculate_iou_matrix(self, *args):
-        x11, y11, x12, y12 = args[:4]
-        x21, y21, x22, y22 = args[4:]
+    def calculate_iou_matrix(self, *coordinates):
+        x11, y11, x12, y12 = coordinates[:4]
+        x21, y21, x22, y22 = coordinates[4:]
         xA = np.maximum(x11, np.transpose(x21))
         yA = np.maximum(y11, np.transpose(y21))
         xB = np.minimum(x12, np.transpose(x22))

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-path = '/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/data/StrawInst'
+path = '/data/StrawInst'
 tar1 = '/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/data/StrawInst/img/'
 tar2 = '/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/data/StrawInst/mask/'
 lists1 = os.listdir(tar1)

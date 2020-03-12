@@ -2,7 +2,7 @@ from PIL import Image
 import os
 
 # path = '../data/PennFudanPed/img'
-path = '../data/PennFudanPed/mask'
+path = '../../data/PennFudanPed/mask'
 lists = os.listdir(path)
 
 for i in lists:

@@ -64,7 +64,7 @@ class YOLACT(nn.Module):
         torch.save(self.state_dict(), path)
 
     def load_weights(self, path):
-        state_dict = torch.load(path)
+        self.load_state_dict(torch.load(path))
 
     def print_weights(self):
         print("Model's state_dict:")

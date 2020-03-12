@@ -44,4 +44,4 @@ pred_th = .0
 
 # fast nms threshold
 fnms_th = 0.7
-
+top_k = 20

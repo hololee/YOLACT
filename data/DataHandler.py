@@ -83,6 +83,6 @@ def get_data(path):
     # collate_fn :  for variable size of batch. , collate_fn=utils.collate_fn
 
     data_loader_test = torch.utils.data.DataLoader(
-        dataset_test, batch_size=1, shuffle=False, num_workers=4)
+        dataset_test, batch_size=1, shuffle=False, num_workers=0)
 
     return data_loader_train, data_loader_test
