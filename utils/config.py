@@ -41,3 +41,7 @@ device = torch.device(3 if torch.cuda.is_available() else torch.device('cpu'))
 
 # predict.
 pred_th = .0
+
+# fast nms threshold
+fnms_th = 0.7
+

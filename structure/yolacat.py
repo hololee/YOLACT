@@ -47,10 +47,10 @@ class YOLACT(nn.Module):
                      'p6': map_box_p6,
                      'p7': map_box_p7}
         map_coef = {'p3': map_mask_p3,
-                     'p4': map_mask_p4,
-                     'p5': map_mask_p5,
-                     'p6': map_mask_p6,
-                     'p7': map_mask_p7}
+                    'p4': map_mask_p4,
+                    'p5': map_mask_p5,
+                    'p6': map_mask_p6,
+                    'p7': map_mask_p7}
 
         '''
         proto_types : {N, C, H, W}; C = n_proto(=4)
@@ -65,6 +65,11 @@ class YOLACT(nn.Module):
 
     def load_weights(self, path):
         state_dict = torch.load(path)
+
+    def print_weights(self):
+        print("Model's state_dict:")
+        for param_tensor in self.state_dict():
+            print(param_tensor, "\t", self.state_dict()[param_tensor].size())
 # # foward test.
 # x = torch.ones(1, 3, 512, 512)
 # yolacat = YOLACT()

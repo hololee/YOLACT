@@ -1,7 +1,7 @@
 import torch
 import data.DataHandler as data_handle
 import utils.config as cfg
-from model.yolacat import YOLACT as yolact
+from structure.yolacat import YOLACT as yolact
 from structure.LossAll import AllLoss
 from utils.AnchorHandler import AnchorHandler as anchor_handle
 import time
@@ -60,7 +60,7 @@ def train(device, optimizer, lr_scheduler, img_c, target_c, anchor_handler, loss
     if total_loss != 0:
         total_loss.backward()
         optimizer.step()
-        #lr_scheduler.step()
+        # lr_scheduler.step()
 
     return total_loss
 
@@ -85,3 +85,7 @@ for epoch in range(cfg.total_epoch):
 
         print("[{}/{}][{}/{}] train loss : {}, TIME : {}s".format(epoch + 1, cfg.total_epoch, iter + 1, len(data_loader_train), total_loss, time.time() - cur))
     print("EPOCH TIME : {}s".format(time.time() - epoch_time))
+
+    if epoch == cfg.total_epoch - 1:
+        model.print_weights()
+        model.save_weights("/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/model/model_epoch_200_lr_1e-4_bat_20_layer_2to5.pth")
