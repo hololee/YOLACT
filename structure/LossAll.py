@@ -28,8 +28,8 @@ class AllLoss(nn.Module):
           anchor_gt_idxs = (p3 to p7){N, C, H, W}; C = n_anchor(=3), (H, W) =  64, 32, 16, 8, 4  * anchor ratio = [1, 1/2, 2] : index of gt.box
           '''
 
-        self.crit_cls = torch.nn.BCELoss(reduction='sum')
-        self.crit_loc = torch.nn.SmoothL1Loss(reduction='sum')
+        self.crit_cls = torch.nn.BCELoss(reduction='mean')
+        self.crit_loc = torch.nn.SmoothL1Loss(reduction='mean')
         self.crit_mask = torch.nn.BCELoss(reduction='mean')
 
     def forward(self, device, model, img, target, anchor_handler, plot=False):
@@ -51,7 +51,9 @@ class AllLoss(nn.Module):
         # anchor state.
         anchor_centers, anchor_boxes = anchor_handler.anchor_centers, anchor_handler.anchor_boxes
 
-        total_loss = 0
+        loss_cls = 0
+        loss_loc = 0
+        loss_msk = 0
 
         for i_batch in range(len(img)):
 
@@ -83,11 +85,14 @@ class AllLoss(nn.Module):
                     # # calculate cls loss
                     output_class_pos = map_class[np.nonzero(anchor_class)]
                     output_class_pos.view(-1, cfg.num_classes)
+
                     output_class_neg = map_class[np.where(anchor_class == 0)][:3 * len(output_class_pos)]
                     output_class_neg.view(-1, cfg.num_classes)
 
-                    output_class_pos = torch.exp(output_class_pos) / (torch.exp(output_class_pos) + torch.exp(torch.tensor(0.)))
-                    output_class_neg = torch.exp(output_class_neg) / (torch.exp(output_class_neg) + torch.exp(torch.tensor(0.)))
+                    output_class_pos = torch.sigmoid(output_class_pos)
+                    output_class_neg = torch.sigmoid(output_class_neg)
+                    # output_class_pos = torch.exp(output_class_pos) / (torch.exp(output_class_pos) + torch.exp(torch.tensor(0.)))
+                    # output_class_neg = torch.exp(output_class_neg) / (torch.exp(output_class_neg) + torch.exp(torch.tensor(1.)))
 
                     # TODO: calculate loss and train network.
                     loss_cls_positive += self.crit_cls(output_class_pos,
@@ -118,13 +123,21 @@ class AllLoss(nn.Module):
                             ([map_coef[0, anchor_ratio * cfg.num_prototype + x, anchor_coord[0], anchor_coord[1]] for x in range(cfg.num_prototype)]))
                         proto_type = torch.stack([proto_types[i_batch, x, :, :] for x in range(cfg.num_prototype)], dim=0)
                         mul = proto_type.squeeze() * co_ef.squeeze().unsqueeze(dim=-1).unsqueeze(dim=-1)
+
+                        # sigmoid make image to positive.
                         mask_result = torch.sigmoid(mul.sum(0).unsqueeze(0))
-                        predict = F.interpolate(mask_result.unsqueeze(0), size=512)
-                        # predict = mask_result.unsqueeze(0)
+                        # predict = F.interpolate(mask_result.unsqueeze(0), size=512)
+                        predict = mask_result.unsqueeze(0)
                         goal = target[i_batch]["masks"][:, int(gt_type), :, :].unsqueeze(0)
+                        goal = F.interpolate(goal, size=(128, 128), mode='nearest')
 
                         # plot prediction.
                         if plot and i_batch == 0:
+                            # threshold = torch.unique(predict.clone().squeeze().cpu().detach())[
+                            #     int(len(torch.unique(predict.clone().squeeze().cpu().detach())) * cfg.pred_th)]
+                            # out = (predict.clone().squeeze().cpu().detach() > threshold).float()
+                            out = predict.clone().squeeze().cpu().detach()
+
                             predict_ch = (pr_l_ch.item() * a_h) + a_ch
                             predict_cw = (pr_l_cw.item() * a_w) + a_cw
                             predict_h = a_h * np.power(10, pr_l_h.item())
@@ -155,37 +168,37 @@ class AllLoss(nn.Module):
                             plt.legend(lines, labels, bbox_to_anchor=(1, 2))
 
                             # calculate rect. gt and predict.
-                            rect1 = patches.Rectangle(
-                                ((predict_cw - predict_w / 2), predict_ch - predict_h / 2),
-                                predict_w, predict_h,
-                                linewidth=1,
-                                edgecolor='r',
-                                facecolor='none')
-                            rect2 = patches.Rectangle(
-                                ((gt_cw - gt_w / 2), gt_ch - gt_h / 2),
-                                gt_w, gt_h,
-                                linewidth=1,
-                                edgecolor='g',
-                                facecolor='none')
-                            ax2.imshow(predict.clone().squeeze().cpu().detach().numpy())
-                            ax2.add_patch(rect2)
-                            ax2.add_patch(rect1)
+                            # rect1 = patches.Rectangle(
+                            #     ((predict_cw - predict_w / 2), predict_ch - predict_h / 2),
+                            #     predict_w, predict_h,
+                            #     linewidth=1,
+                            #     edgecolor='r',
+                            #     facecolor='none')
+                            # rect2 = patches.Rectangle(
+                            #     ((gt_cw - gt_w / 2), gt_ch - gt_h / 2),
+                            #     gt_w, gt_h,
+                            #     linewidth=1,
+                            #     edgecolor='g',
+                            #     facecolor='none')
+                            ax2.imshow(out.numpy())
+                            # ax2.add_patch(rect2)
+                            # ax2.add_patch(rect1)
                             # calculate rect. gt and predict.
-                            rect1 = patches.Rectangle(
-                                ((predict_cw - predict_w / 2), predict_ch - predict_h / 2),
-                                predict_w, predict_h,
-                                linewidth=1,
-                                edgecolor='r',
-                                facecolor='none')
-                            rect2 = patches.Rectangle(
-                                ((gt_cw - gt_w / 2), gt_ch - gt_h / 2),
-                                gt_w, gt_h,
-                                linewidth=1,
-                                edgecolor='g',
-                                facecolor='none')
+                            # rect1 = patches.Rectangle(
+                            #     ((predict_cw - predict_w / 2), predict_ch - predict_h / 2),
+                            #     predict_w, predict_h,
+                            #     linewidth=1,
+                            #     edgecolor='r',
+                            #     facecolor='none')
+                            # rect2 = patches.Rectangle(
+                            #     ((gt_cw - gt_w / 2), gt_ch - gt_h / 2),
+                            #     gt_w, gt_h,
+                            #     linewidth=1,
+                            #     edgecolor='g',
+                            #     facecolor='none')
                             ax3.imshow(goal.clone().squeeze().cpu().detach().numpy())
-                            ax3.add_patch(rect2)
-                            ax3.add_patch(rect1)
+                            # ax3.add_patch(rect2)
+                            # ax3.add_patch(rect1)
                             # plt.show()
                             plt.savefig('/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/image/{}.png'.format(time.time()))
                             # imageio.imwrite('/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/image/{}.png'.format(time.time()),
@@ -199,11 +212,16 @@ class AllLoss(nn.Module):
                         pass
 
             if num_matched_anchors > 0:
-                total_loss += ((loss_cls_positive + loss_cls_negative + cfg.loss_cls_alpha * loss_localization) + loss_mask / num_matched_anchors)
+                loss_cls += ((loss_cls_positive + loss_cls_negative) / num_matched_anchors)
+                loss_loc += ((cfg.loss_cls_alpha * loss_localization) / num_matched_anchors)
+                loss_msk += (loss_mask / num_matched_anchors)
             else:
                 print("no matched anchor box.")
-
-        return total_loss / len(img)
+        # with torch.no_grad():
+        #     print("loss_cls : ", loss_cls)
+        #     print("loss_loc : ", loss_loc)
+        #     print("loss_msk : ", loss_msk)
+        return (loss_cls + loss_loc + loss_msk) / len(img)
 
 
 """SSD Weighted Loss Function

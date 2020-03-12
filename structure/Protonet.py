@@ -26,7 +26,8 @@ class ProtoNet(nn.Module):
         layer = F.relu(self.batch3(self.conv3(layer)))
         layer = F.relu(self.batch4(self.conv4(layer)))
         layer = F.relu(self.de_batch1(self.deconv1(layer)))
-        proto_types = self.conv5(layer)
+        proto_types = F.relu(self.conv5(layer))
+        # activate using relu then result always positive.
 
         """
         In last layer.

@@ -17,6 +17,9 @@ class YOLACT(nn.Module):
         self.protonet.to(device=device)
         self.prednet.to(device=device)
 
+        # in test time, calculate semantic segmentation loss.
+        # self.conv_seg = torch.nn.Conv2d(256, 1,)
+
     def forward(self, x):
         p3, p4, p5, p6, p7 = self.fpnet(x)
 

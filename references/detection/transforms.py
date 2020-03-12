@@ -24,6 +24,23 @@ class Compose(object):
         return image, target
 
 
+class Normalize(object):
+    def __init__(self, mean, std):
+        '''
+        Args:
+            mean (sequence): Sequence of means for each channel.
+            std (sequence): Sequence of standard deviations for each channel.
+        '''
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, image, target):
+        return F.normalize(image, self.mean, self.std), target
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
+
+
 class RandomHorizontalFlip(object):
     def __init__(self, prob):
         self.prob = prob

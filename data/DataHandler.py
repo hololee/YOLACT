@@ -28,8 +28,8 @@ class PennFudanDataset:
 
         obj_ids = np.unique(mask)
         # Notice change the background
-        obj_ids = obj_ids[1:]  # except background.
-        # obj_ids = obj_ids[:-1]  # except background.
+        # obj_ids = obj_ids[1:]  # except background.
+        obj_ids = obj_ids[:-1]  # except background.
 
         masks = mask == obj_ids[:, None, None]
 
@@ -66,8 +66,7 @@ def get_data(path):
     def get_transform(train):
         transforms = []
         transforms.append(T.ToTensor())
-        # if train:
-        #     transforms.append(T.RandomHorizontalFlip(0.5))
+        # transforms.append(T.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)))
         return T.Compose(transforms)
 
     dataset = PennFudanDataset(path, get_transform(train=True))
