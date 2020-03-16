@@ -9,7 +9,7 @@ num_prototype = 32  # number of prototypes. k
 default_detect_iou = 0.5  # define isObject threshold.
 
 pre_trained = False
-total_epoch = 200  # epochs.
+total_epoch = 1000  # epochs.
 learning_rate = 0.0001
 
 # Notice : now not using lr schedule.
@@ -40,8 +40,9 @@ data_divide = 50
 device = torch.device(3 if torch.cuda.is_available() else torch.device('cpu'))
 
 # predict.
-pred_th = .0
+pr_epoch = 999  # 500
+pred_th = .6
 
 # fast nms threshold
-fnms_th = 0.7
-top_k = 20
+fnms_th = 0.3
+top_k = 10

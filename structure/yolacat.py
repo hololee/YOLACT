@@ -36,11 +36,14 @@ class YOLACT(nn.Module):
         map_class_p6, map_box_p6, map_mask_p6 = self.prednet(p6)
         map_class_p7, map_box_p7, map_mask_p7 = self.prednet(p7)
 
-        map_classes = {'p3': map_class_p3,
-                       'p4': map_class_p4,
-                       'p5': map_class_p5,
-                       'p6': map_class_p6,
-                       'p7': map_class_p7}
+        # output_class_pos = torch.exp(output_class_pos) / (torch.exp(output_class_pos) + torch.exp(torch.tensor(0.)))
+        # output_class_neg = torch.exp(output_class_neg) / (torch.exp(output_class_neg) + torch.exp(torch.tensor(1.)))
+
+        map_classes = {'p3': torch.sigmoid(map_class_p3),
+                       'p4': torch.sigmoid(map_class_p4),
+                       'p5': torch.sigmoid(map_class_p5),
+                       'p6': torch.sigmoid(map_class_p6),
+                       'p7': torch.sigmoid(map_class_p7)}
         map_boxes = {'p3': map_box_p3,
                      'p4': map_box_p4,
                      'p5': map_box_p5,

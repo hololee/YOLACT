@@ -86,13 +86,12 @@ class AllLoss(nn.Module):
                     output_class_pos = map_class[np.nonzero(anchor_class)]
                     output_class_pos.view(-1, cfg.num_classes)
 
-                    output_class_neg = map_class[np.where(anchor_class == 0)][:3 * len(output_class_pos)]
+                    # randomly choose background boxes.
+                    output_class_neg_prev = map_class[np.where(anchor_class == 0)]
+                    rand_index = torch.multinomial(torch.tensor(list(range(output_class_neg_prev.size()[0]))).float(), 3 * len(output_class_pos))
+                    output_class_neg = output_class_neg_prev[rand_index]
+                    # output_class_neg = map_class[np.where(anchor_class == 0)][:3 * len(output_class_pos)]
                     output_class_neg.view(-1, cfg.num_classes)
-
-                    output_class_pos = torch.sigmoid(output_class_pos)
-                    output_class_neg = torch.sigmoid(output_class_neg)
-                    # output_class_pos = torch.exp(output_class_pos) / (torch.exp(output_class_pos) + torch.exp(torch.tensor(0.)))
-                    # output_class_neg = torch.exp(output_class_neg) / (torch.exp(output_class_neg) + torch.exp(torch.tensor(1.)))
 
                     # TODO: calculate loss and train network.
                     loss_cls_positive += self.crit_cls(output_class_pos,
@@ -167,40 +166,16 @@ class AllLoss(nn.Module):
                             lines = [Line2D([0], [0], color=c, linewidth=3, linestyle='-') for c in colors]
                             plt.legend(lines, labels, bbox_to_anchor=(1, 2))
 
-                            # calculate rect. gt and predict.
-                            # rect1 = patches.Rectangle(
-                            #     ((predict_cw - predict_w / 2), predict_ch - predict_h / 2),
-                            #     predict_w, predict_h,
-                            #     linewidth=1,
-                            #     edgecolor='r',
-                            #     facecolor='none')
-                            # rect2 = patches.Rectangle(
-                            #     ((gt_cw - gt_w / 2), gt_ch - gt_h / 2),
-                            #     gt_w, gt_h,
-                            #     linewidth=1,
-                            #     edgecolor='g',
-                            #     facecolor='none')
                             ax2.imshow(out.numpy())
-                            # ax2.add_patch(rect2)
-                            # ax2.add_patch(rect1)
-                            # calculate rect. gt and predict.
-                            # rect1 = patches.Rectangle(
-                            #     ((predict_cw - predict_w / 2), predict_ch - predict_h / 2),
-                            #     predict_w, predict_h,
-                            #     linewidth=1,
-                            #     edgecolor='r',
-                            #     facecolor='none')
-                            # rect2 = patches.Rectangle(
-                            #     ((gt_cw - gt_w / 2), gt_ch - gt_h / 2),
-                            #     gt_w, gt_h,
-                            #     linewidth=1,
-                            #     edgecolor='g',
-                            #     facecolor='none')
+
                             ax3.imshow(goal.clone().squeeze().cpu().detach().numpy())
                             # ax3.add_patch(rect2)
                             # ax3.add_patch(rect1)
                             # plt.show()
-                            plt.savefig('/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/image/{}.png'.format(time.time()))
+                            plt.title("out score : {}".format(map_class[0, anchor_ratio, anchor_coord[0], anchor_coord[1]]))
+
+                            plt.savefig('/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/image/train/{}.png'.format(time.time()))
+
                             # imageio.imwrite('/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/image/{}.png'.format(time.time()),
                             #                 np.transpose(img.cpu().numpy(), [0, 2, 3, 1]).squeeze().astype(np.uint8))
                             # imageio.imwrite('/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/image/{}.png'.format(time.time()),
