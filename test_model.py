@@ -116,7 +116,7 @@ with torch.no_grad():
         # visualize one image.
         mVisualizer.visualize(img[0], "predict", valid_boxes, valid_scores, valid_coefs, proto_types,
                               target["boxes"][0], target["masks"][0]).show(
-            "/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/image/predict/img_{}.png".format(iter))
+            "/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/image/predict/img_{}.png".format(iter), is_show=True)
 
         take_time = time.time() - start_pr
         print("predict_time :", take_time, "(s)")

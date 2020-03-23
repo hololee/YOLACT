@@ -40,7 +40,7 @@ data_divide = 50
 device = torch.device(3 if torch.cuda.is_available() else torch.device('cpu'))
 
 # predict.
-pr_epoch = 999  # 500
+pr_epoch = 500  # 500
 pred_th = .6
 
 # fast nms threshold
