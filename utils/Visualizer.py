@@ -44,14 +44,14 @@ class Visualizer(object):
                              (36, 137, 176),
                              (221, 160, 246),
                              (247, 72, 119),
-                             (0, 173, 95),
+                             (1, 173, 95),
                              (255, 75, 90),
-                             (0, 187, 236),
+                             (1, 187, 236),
                              (189, 89, 212),
-                             (255, 131, 0),
+                             (255, 131, 1),
                              (235, 72, 71),
                              (128, 88, 189),
-                             (0, 181, 233),
+                             (1, 181, 233),
                              (98, 216, 182),
                              (194, 226, 84),
                              (255, 217, 101),
@@ -86,7 +86,7 @@ class Visualizer(object):
                     ((predict_cw - predict_w / 2), predict_ch - predict_h / 2),
                     predict_w, predict_h,
                     linewidth=3,
-                    edgecolor='w',
+                    edgecolor='b',
                     facecolor='none')
 
                 self.rects.append(rect)
@@ -119,6 +119,7 @@ class Visualizer(object):
             self.mask_predict = np.transpose(self.mask_predict, [1, 2, 0])
             self.mask_target = np.transpose(self.mask_target, [1, 2, 0])
 
+            self.a_channel[np.where(self.mask_predict[:, :, 0] == 0)] = -127
             # skip target box.
 
             '''
@@ -144,10 +145,10 @@ class Visualizer(object):
                 ax1.add_patch(self.rects[idx])
                 y, x = self.centers[idx]
                 # ax1.annotate(str(self.scores[idx])[:4], (x, y), color='w', weight='bold', fontsize=8, ha='left', va='top')
-                ax15.annotate(str((self.ripe_scores[idx] + 128) *100 / 256)[:4] +"%",
+                ax15.annotate(str((self.ripe_scores[idx] + 128) * 100 / 256)[:4] + "%",
                               (x, y), color='w', weight='bold', fontsize=35, ha='left', va='top')
 
-            ax15.imshow(self.a_channel)
+            ax15.imshow(self.a_channel, cmap="jet")
 
             ax2.imshow(self.mask_predict)
             # ax3.imshow(self.mask_target)
