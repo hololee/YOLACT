@@ -65,6 +65,8 @@ def train(device, optimizer, lr_scheduler, img_c, target_c, anchor_handler, loss
     return total_loss
 
 
+time_stack = []
+
 for epoch in range(cfg.total_epoch):
     epoch_time = time.time()
 
@@ -84,6 +86,10 @@ for epoch in range(cfg.total_epoch):
         # True if iter == len(data_loader_train) - 1 else False
 
         print("[{}/{}][{}/{}] train loss : {}, TIME : {}s".format(epoch + 1, cfg.total_epoch, iter + 1, len(data_loader_train), total_loss, time.time() - cur))
+
+        # stack time.
+        time_stack.append(time.time() - cur)
+
     print("EPOCH TIME : {}s".format(time.time() - epoch_time))
 
     if epoch + 1 == 200 or epoch + 1 == 300 or epoch + 1 == 400 or epoch + 1 == 500 or epoch + 1 == 600 or epoch + 1 == 700 or epoch + 1 == 800 or epoch + 1 == 900 or epoch + 1 == cfg.total_epoch - 1:

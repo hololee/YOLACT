@@ -38,7 +38,7 @@ class AnchorHandler:
         self.feature_width = {'p3': img_w // (2 ** 3), 'p4': img_w // (2 ** 4), 'p5': img_w // (2 ** 5),
                               'p6': img_w // (2 ** 6), 'p7': img_w // (2 ** 7)}
 
-        assert 4 > cfg.using_start_layer_no > 0 and cfg.using_start_layer_no < cfg.using_stop_layer_no <= 5, "Check the index of layer."
+        assert 4 > cfg.using_start_layer_no >= 0 and cfg.using_start_layer_no < cfg.using_stop_layer_no <= 5, "Check the index of layer."
         self.layers = self.layers_T[cfg.using_start_layer_no: cfg.using_stop_layer_no]
 
         self.anchor_centers = {}

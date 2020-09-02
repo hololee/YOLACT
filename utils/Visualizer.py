@@ -125,7 +125,7 @@ class Visualizer(object):
             '''
             self.rects
             self.centers
-             self.ripe_scores
+            self.ripe_scores
             self.scores
             self.mask_predict
             self.mask_target

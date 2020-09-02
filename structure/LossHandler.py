@@ -99,6 +99,7 @@ class AllLoss(nn.Module):
                     loss_cls_negative += self.crit_cls(output_class_neg,
                                                        torch.from_numpy(np.zeros(shape=output_class_neg.shape, dtype=np.float32)).to(device))
 
+
                     # # calculate localization loss.
                     for i in range(cur_num_anchors):
                         # TODO : CHECK AGAIN. IF HAVE MULTIPLE CLASSES.  (anchor_class)
