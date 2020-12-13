@@ -24,8 +24,8 @@ loss_cls_alpha = 1
 shake_data = False
 
 # p3 p4 p5 p6 p7
-using_start_layer_no = 2
-using_stop_layer_no = 5
+using_start_layer_no = 1
+using_stop_layer_no = 3
 
 # A1 case 0:3
 # in person case 2:5
@@ -37,10 +37,10 @@ dataset = '/home/user01/data_ssd/LeeJongHyeok/pytorch_project/YOLACT/data/StrawI
 data_divide = 50
 
 # gpu number
-device = torch.device(3 if torch.cuda.is_available() else torch.device('cpu'))
+device = torch.device(1 if torch.cuda.is_available() else torch.device('cpu'))
 
 # predict.
-pr_epoch = 999  # 500
+pr_epoch = 500  # 500
 pred_th = .6
 
 # fast nms threshold
