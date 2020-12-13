@@ -15,6 +15,14 @@ Some configuration params in `/utils/config.py`.
 Test result using strawberry img is in `/image/predict` folder.
 
 
+### Result  
+
+|![image1](https://github.com/hololee/YOLACT/blob/master/image/predict/img_0.png?raw=true)|![image1](https://github.com/hololee/YOLACT/blob/master/image/predict/img_1.png?raw=true)|
+|----|----|
+|![image1](https://github.com/hololee/YOLACT/blob/master/image/predict/img_2.png?raw=true)|![image1](https://github.com/hololee/YOLACT/blob/master/image/predict/img_3.png?raw=true)|
+|![image1](https://github.com/hololee/YOLACT/blob/master/image/predict/img_4.png?raw=true)|![image1](https://github.com/hololee/YOLACT/blob/master/image/predict/img_5.png?raw=true)|
+
+
 
 
 
